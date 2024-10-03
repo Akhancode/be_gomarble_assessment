@@ -1,0 +1,79 @@
+#http://localhost:8080/api-docs/
+
+openapi: 3.0.0
+docExpansion: '`none`'
+info:
+  title: GoMarbles.ai - Assessment
+  description: | 
+                Develop an API server capable of extracting reviews information from any given product page (e.g., Shopify, Amazon).
+
+                The API should dynamically identify CSS elements of reviews and handle pagination to retrieve all reviews. 
+                  
+  version: 1.0.0
+servers:
+  # - url: http://13.60.216.166/api
+  - url: http://localhost:9000/api
+    # description:       Optional server description, e.g. Internal staging server for testing
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      securityDefinitions:
+paths:
+ #PAYMENT
+  /reviews:
+    get:
+      tags:
+        - Product
+      summary: Get Reviews 
+      parameters:
+        - in: query
+          name: page
+          type: string
+          required: true
+          description: product link  
+          example: https://bhumi.com.au/products/organic-cotton-flannelette-sheet-set-plaid
+      responses:
+        '200':    # status code
+          description: A JSON array of content
+          content:
+            application/json:
+              schema: 
+                type: array
+                example: 
+                    {
+             
+                      }
+                  
+        '400':
+          description: bad request    
+  
+  /reviews/test:
+    get:
+      tags:
+        - Product
+      summary: Get Reviews 
+      parameters:
+        - in: query
+          name: page
+          type: string
+          required: true
+          description: product link  
+          example: https://bhumi.com.au/products/organic-cotton-flannelette-sheet-set-plaid
+      responses:
+        '200':    # status code
+          description: A JSON array of content
+          content:
+            application/json:
+              schema: 
+                type: array
+                example: 
+                    {
+             
+                      }
+                  
+        '400':
+          description: bad request    
+  
