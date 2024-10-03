@@ -1,18 +1,14 @@
 const puppeteer = require("puppeteer");
 const { gemini_prompt } = require("./src/utils/llm/helper");
 const { sleep } = require("./src/utils/helper/helperFunction");
-async function scrapeByCssSelector(page, selectors) {
+async function scrapeByCssSelector(page, selectors,url) {
   // Launch Puppeteer and open a new browser page
   if (!page) {
     const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage();
-
-    // Go to the specified URL
     await page.goto(url, { waitUntil: "domcontentloaded" });
   }
 
-  // Define CSS selectors
-  // Scrape the review data using the provided CSS selectors
 
   const reviewsData = await page.evaluate((selectors) => {
     // Get all review elements
@@ -42,8 +38,7 @@ async function scrapeByCssSelector(page, selectors) {
 
     return reviewsArray;
   },selectors);
-  // Close the browser
-  //   await browser.close();
+ 
 
   return reviewsData;
 }
