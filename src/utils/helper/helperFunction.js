@@ -86,8 +86,6 @@ async function scrapeReviews(url,selectorsx) {
   while (nextPageExists) {
     // Scrape the reviews on the current page
     const reviewElements = await page.$$(selectorsx.reviewAll);
-    console.log("reviewElements",reviewElements)
-
 
     const reviews = await Promise.all(
       reviewElements.map(async (element) => {
@@ -111,7 +109,7 @@ async function scrapeReviews(url,selectorsx) {
       })
     ).then((rev) => {
       reviewsArr = [...reviewsArr, ...rev];
-    });
+    })
 
     // console.log("running")
     // Check for a "next" button to go to the next page
