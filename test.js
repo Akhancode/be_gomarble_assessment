@@ -2,7 +2,26 @@ const puppeteer = require("puppeteer");
 const path = require("path");
 const { gemini_prompt, openAi_prompt } = require("./src/utils/llm/helper");
 const { sleep } = require("./src/utils/helper/helperFunction");
+const cheerio = require("cheerio");
+const fs = require("fs");
+const cleaningHtml = async (page) => {
+  const htmlContent = await page.content();
+  const $ = cheerio.load(htmlContent);
 
+  // Remove all <script> and <style> tags
+  $("script").remove();
+  $("style").remove();
+  $("img").remove();
+
+  // Optionally remove other unwanted elements (e.g., ads, popups)
+  $(".ad").remove(); // Example class for ads
+  $(".popup").remove(); // Example class for popups
+
+  // Return the cleaned HTML
+  const cleanedHtml = $.html().replace(/\s\s+/g, " ").replace(/\n/g, "").trim();
+
+  return cleanedHtml;
+};
 const checkElementIsBlocked = async (page, targetSelector) => {
   const isBlocked = await page.evaluate((targetSelector) => {
     const targetElement = document.querySelector(targetSelector);
@@ -193,16 +212,15 @@ async function fetchHTML(url) {
     await closeOverlay(page, arrOfPopUpCloseButtons);
 
     //getting All elements related review Attribute
-    let reviewElements = await page.evaluate(() => {
-      return document.body.innerHTML; // Get the inner HTML of the body
-    });
-    let pageElements = await getAllPaginationAttributeElement(page);
+    let reviewElements = await cleaningHtml(page);
 
-    console.log(reviewElements);
+    // let pageElements = await getAllPaginationAttributeElement(page);
+
+    // Saving to txt file HTML
+    // fs.writeFileSync("cleaned_output.txt", String(reviewElements), "utf8");
+    
+    
     console.log("scrapped html content of review related elements ✅ ");
-    // paginationNextBtn : <CSS selector fornext page button element which is clickable  **might be having aria-label="goto next page"  and navigate to next page this must "goto next page" or "icon" or ">" or right arrow mark , only should be one matching element by this selector  >,
-    // paginationNextBtn : <CSS selector for review next page attribute like (aria-label , label , name ) having value[ "next page" , goto to next , next review or next , load more review ] and in CSS Selector add aria-label with value if any eg : (cssSelector[aria-label="goto next page"]). this should be unique and one in body.>,
-
     let promptForFindingSelectors = `
         Analyze the following HTML in array of html and return Most accurate CSS selectors by tag or class or id or any attribute for the following in JSON format:
           {  
@@ -308,9 +326,6 @@ async function fetchHTML(url) {
     console.log("Scrapped review Data ✅ ");
     console.log(reviewFullData);
     sleep(10000);
-    // await page.click(
-    //   "#yotpo-reviews-container > div > nav > div > a:nth-child(3)"
-    // );
 
     if (reviewFullData.length == 0) {
       console.log("rerunning the selector finder");
@@ -385,20 +400,20 @@ async function fetchHTML(url) {
   } catch (error) {
     console.log(error);
   } finally {
-    // await browser.close();
+    await browser.close();
   }
 }
 
 // fetchHTML("https://2717recovery.com/products/recovery-cream");
-// fetchHTML("https://www.amazon.in/Xiaomi-Qualcomm-Snapdragon-Refresh-Speakers/product-reviews/B0C6QYTN7S/ref=cm_cr_dp_d_show_all_btm?ie=UTF8&reviewerType=all_reviews");
+// fetchHTML("https://www.amazon.in/Wowon-Art-Fineliners-Calligraphy-Sketching/product-reviews/B0BFDW9D2W/ref=cm_cr_dp_d_show_all_btm?ie=UTF8&reviewerType=all_reviews");
 // fetchHTML(
 //   "https://bhumi.com.au/products/organic-cotton-flannelette-sheet-set-plaid"
 // );
-// fetchHTML("https://lyfefuel.com/products/essentials-nutrition-shake");
+fetchHTML("https://lyfefuel.com/products/essentials-nutrition-shake");
 
-fetchHTML(
-  "https://www.flipkart.com/walkers-electronic-7in1-mobile-soldering-iron-equipment-tool-machine-combo-kit-set-flux-paste-5-meter-wire-25-w-simple/product-reviews/itm7f26d5189f1c4?pid=SOIFZUNFRYSMGVPX&lid=LSTSOIFZUNFRYSMGVPXOLEX1C&marketplace=FLIPKART"
-);
+// fetchHTML(
+//   "https://www.flipkart.com/walkers-electronic-7in1-mobile-soldering-iron-equipment-tool-machine-combo-kit-set-flux-paste-5-meter-wire-25-w-simple/product-reviews/itm7f26d5189f1c4?pid=SOIFZUNFRYSMGVPX&lid=LSTSOIFZUNFRYSMGVPXOLEX1C&marketplace=FLIPKART"
+// );
 module.exports = { fetchHTML };
 
 /**

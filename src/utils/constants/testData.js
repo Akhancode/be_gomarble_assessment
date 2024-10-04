@@ -17,11 +17,9 @@ const selectorsForFineTuning = {
     body: ".ZmyHeo div div",
     rating: ".XQDdHH.Ga3i8K",
     reviewer: ".AwS1CA",
-    paginationNextBtn: ".WSL9JP a._9QVEpD",
-    currentPageCounter: ".WSL9JP a.cn++Ap.A1msZJ",
-    paginationList: ".WSL9JP",
-    totalNoOfPages: "2",
-    popCloseBtnsArr: ["._1F9SL9"],
+    paginationNextBtn: ".a-pagination .a-last a",
+    currentPageCounter: null,
+    paginationList: ".a-pagination",
   },
   flipkart: {
     reviewAll: ".JxFEK3._48O0EI",
@@ -33,8 +31,18 @@ const selectorsForFineTuning = {
     paginationNextBtn: ".WSL9JP a._9QVEpD",
     currentPageCounter: ".WSL9JP a.cn++Ap.A1msZJ",
     paginationList: ".WSL9JP",
-    totalNoOfPages: "2",
-    popCloseBtnsArr: ["._1F9SL9"],
   },
+  lyfefuel: {
+    reviewAll: '.R-ContentList-container',
+    review: '.R-ContentList__item',
+    title: '.R-TextHeading.R-TextHeading--xxs.u-textLeft--all:not(.cssVar-authorName)',
+    body: '.R-TextBody.R-TextBody--xs.u-textLeft--all',
+    rating: '.R-RatingStars__stars',
+    reviewer: '.R-TextHeading.cssVar-authorName',
+    paginationNextBtn: null,
+    currentPageCounter: '.R-PaginationControls__item.isActive.Pagination__item--outline',
+    paginationList: '.R-PaginationControls',
+  }
+ 
 };
 module.exports = { bhumi_com };
