@@ -235,10 +235,14 @@ const closeOverlay = async (page, closeButtonSelectors) => {
 
 // main function------
 async function scrapePage(url, scapeByLLM = false) {
-  const browser = await puppeteer.launch({
+  const pptOption = {
     headless: headlessValue,
     args: ["--no-sandbox"],
-  });
+  };
+  if(process.env.NODE == "production"){
+    pptOption[executablePath]="/usr/bin/chromium-browser"
+  }
+  const browser = await puppeteer.launch(pptOption);
   try {
     scapeByLLM
       ? console.log("Initiated scrapping type  by 'LLM' ⌛ ")
