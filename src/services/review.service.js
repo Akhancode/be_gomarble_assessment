@@ -54,7 +54,10 @@ const checkElementIsBlocked = async (page, targetSelector) => {
 async function scrapeByCssSelector(page, selectors, url) {
   // Launch Puppeteer and open a new browser page
   if (!page) {
-    const browser = await puppeteer.launch({ headless: headlessValue });
+    const browser = await puppeteer.launch({
+      headless: headlessValue,
+      args: ["--no-sandbox"],
+    });
     const page = await browser.newPage();
     await page.goto(url, { waitUntil: "domcontentloaded" });
   }
@@ -93,7 +96,10 @@ async function scrapeByCssSelector(page, selectors, url) {
 async function scrapeByLLMByReviewTile(page, selectors, url) {
   // Launch Puppeteer and open a new browser page
   if (!page) {
-    const browser = await puppeteer.launch({ headless: headlessValue });
+    const browser = await puppeteer.launch({
+      headless: headlessValue,
+      args: ["--no-sandbox"],
+    });
     const page = await browser.newPage();
     await page.goto(url, { waitUntil: "domcontentloaded" });
   }
@@ -231,6 +237,7 @@ const closeOverlay = async (page, closeButtonSelectors) => {
 async function scrapePage(url, scapeByLLM = false) {
   const browser = await puppeteer.launch({
     headless: headlessValue,
+    args: ["--no-sandbox"],
   });
   try {
     scapeByLLM
@@ -277,7 +284,7 @@ async function scrapePage(url, scapeByLLM = false) {
     let reviewFullData = [];
     let nextPageExists = true;
     var lastPageCount = 0;
-    let prevData = []
+    let prevData = [];
     let currPageNo = 1;
 
     // Pagination handling
@@ -289,10 +296,10 @@ async function scrapePage(url, scapeByLLM = false) {
         if (currPageNo > Number(parsedCssSelectors.totalNoOfPages)) {
           console.log("Finished ... return data ");
           nextPageExists = false;
-          prevData = []
+          prevData = [];
         }
       }
-      prevData.push(JSON.stringify(reviewData))
+      prevData.push(JSON.stringify(reviewData));
       reviewFullData = [...reviewFullData, ...reviewData];
       currPageNo++;
       try {
