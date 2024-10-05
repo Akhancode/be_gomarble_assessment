@@ -238,10 +238,12 @@ async function scrapePage(url, scapeByLLM = false) {
   const pptOption = {
     headless: headlessValue,
     args: ["--no-sandbox"],
+    
   };
   if(process.env.NODE == "production"){
-    pptOption[executablePath]="/usr/bin/chromium-browser"
+    pptOption["executablePath"]="/usr/bin/chromium-browser"
   }
+  console.log(pptOption)
   const browser = await puppeteer.launch(pptOption);
   try {
     scapeByLLM
