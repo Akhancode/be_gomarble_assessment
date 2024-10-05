@@ -3,13 +3,14 @@ const path = require("path");
 
 const cheerio = require("cheerio");
 const fs = require("fs");
-const { sleep } = require("../utils/helper/helperFunction");
+const { sleep, parseBoolean } = require("../utils/helper/helperFunction");
 const { gemini_prompt } = require("../utils/llm/helper");
 const {
   generate_promptForFindingSelectors,
   generate_promptForScrappingFromReviewBlock,
 } = require("../utils/prompts/prompts");
 
+const headlessValue = parseBoolean(process.env.ISHEADLESS);
 //functions------
 const cleaningHtml = async (page) => {
   const htmlContent = await page.content();
@@ -53,7 +54,7 @@ const checkElementIsBlocked = async (page, targetSelector) => {
 async function scrapeByCssSelector(page, selectors, url) {
   // Launch Puppeteer and open a new browser page
   if (!page) {
-    const browser = await puppeteer.launch({ headless: false });
+    const browser = await puppeteer.launch({ headless: headlessValue });
     const page = await browser.newPage();
     await page.goto(url, { waitUntil: "domcontentloaded" });
   }
@@ -92,7 +93,7 @@ async function scrapeByCssSelector(page, selectors, url) {
 async function scrapeByLLMByReviewTile(page, selectors, url) {
   // Launch Puppeteer and open a new browser page
   if (!page) {
-    const browser = await puppeteer.launch({ headless: false });
+    const browser = await puppeteer.launch({ headless: headlessValue });
     const page = await browser.newPage();
     await page.goto(url, { waitUntil: "domcontentloaded" });
   }
@@ -229,7 +230,7 @@ const closeOverlay = async (page, closeButtonSelectors) => {
 // main function------
 async function scrapePage(url, scapeByLLM = false) {
   const browser = await puppeteer.launch({
-    headless: false,
+    headless: headlessValue,
   });
   try {
     scapeByLLM
@@ -276,24 +277,24 @@ async function scrapePage(url, scapeByLLM = false) {
     let reviewFullData = [];
     let nextPageExists = true;
     var lastPageCount = 0;
-    let prevData;
+    let prevData = []
     let currPageNo = 1;
-
 
     // Pagination handling
     while (nextPageExists) {
       const reviewData = scapeByLLM
         ? await scrapeByLLMByReviewTile(page, parsedCssSelectors)
         : await scrapeByCssSelector(page, parsedCssSelectors);
-      if (JSON.stringify(prevData) == JSON.stringify(reviewData)) {
-        if (currPageNo >= Number(parsedCssSelectors.totalNoOfPages)) {
+      if (prevData.includes(JSON.stringify(reviewData))) {
+        if (currPageNo > Number(parsedCssSelectors.totalNoOfPages)) {
           console.log("Finished ... return data ");
           nextPageExists = false;
+          prevData = []
         }
       }
-      prevData = reviewData;
+      prevData.push(JSON.stringify(reviewData))
       reviewFullData = [...reviewFullData, ...reviewData];
-      currPageNo++
+      currPageNo++;
       try {
         const btnNextPage = await page.$(parsedCssSelectors.paginationNextBtn);
         if (!btnNextPage) {

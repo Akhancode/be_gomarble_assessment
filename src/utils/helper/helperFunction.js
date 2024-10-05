@@ -2,6 +2,7 @@ const fs = require("fs");
 const { default: puppeteer } = require("puppeteer");
 const { gemini_prompt } = require("../llm/helper");
 
+
 function readJson(jsonFilePath) {
   const rawData = fs.readFileSync(jsonFilePath);
   return JSON.parse(rawData);
@@ -15,7 +16,8 @@ function writeJson(dataToStore, jsonFilePath) {
 //function for reusing scrape HTML content
 async function scrapeHTML(url) {
   try {
-    const browser = await puppeteer.launch({ headless: true });
+    const headlessValue = parseBoolean(process.env.ISHEADLESS);
+    const browser = await puppeteer.launch({ headless: headlessValue });
     const page = await browser.newPage();
     await page.goto(url, { waitUntil: "domcontentloaded" });
 
@@ -30,8 +32,9 @@ async function scrapeHTML(url) {
 }
 
 async function scrapeByCssSelector(url, selectors) {
+  const headlessValue = parseBoolean(process.env.ISHEADLESS);
   // Launch Puppeteer and open a new browser page
-  const browser = await puppeteer.launch({ headless: false });
+  const browser = await puppeteer.launch({ headless: headlessValue });
   const page = await browser.newPage();
 
   // Go to the specified URL
@@ -76,7 +79,7 @@ const selectorsx = {
 };
 async function scrapeReviews(url, selectorsx) {
   var lastPageCount = 0;
-  const browser = await puppeteer.launch({ headless: false });
+  const browser = await puppeteer.launch({ headless: headlessValue });
   const page = await browser.newPage();
   await page.goto(url, { waitUntil: "load" });
 
@@ -143,7 +146,7 @@ async function scrapeReviews(url, selectorsx) {
   return reviewsArr;
 }
 async function scrapeReviewsByLLM(url) {
-  const browser = await puppeteer.launch({ headless: false });
+  const browser = await puppeteer.launch({ headless: headlessValue });
   const page = await browser.newPage();
   await page.goto(url, { waitUntil: "load" });
 
