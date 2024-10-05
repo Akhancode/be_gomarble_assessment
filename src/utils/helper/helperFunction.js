@@ -2,7 +2,6 @@ const fs = require("fs");
 const { default: puppeteer } = require("puppeteer");
 const { gemini_prompt } = require("../llm/helper");
 
-
 function readJson(jsonFilePath) {
   const rawData = fs.readFileSync(jsonFilePath);
   return JSON.parse(rawData);
@@ -75,7 +74,7 @@ const selectorsx = {
   reviewer: ".yotpo-reviewer-name",
   nextBtn: "#yotpo-reviews-container > div > nav > div > a:nth-child(3)",
 };
-async function scrapeReviews(url,selectorsx) {
+async function scrapeReviews(url, selectorsx) {
   var lastPageCount = 0;
   const browser = await puppeteer.launch({ headless: false });
   const page = await browser.newPage();
@@ -89,7 +88,6 @@ async function scrapeReviews(url,selectorsx) {
 
     const reviews = await Promise.all(
       reviewElements.map(async (element) => {
-
         // Example: Extracting the text from each review
         const title = await element.$eval(
           selectorsx.title,
@@ -109,7 +107,7 @@ async function scrapeReviews(url,selectorsx) {
       })
     ).then((rev) => {
       reviewsArr = [...reviewsArr, ...rev];
-    })
+    });
 
     // console.log("running")
     // Check for a "next" button to go to the next page
@@ -212,8 +210,6 @@ async function scrapeReviewsByLLM(url) {
     }
   }
   const allReviews = reviewsArr.map((obj) => obj.htmlBlock);
-  console.log(reviewsArr.map((o) => o.reviewer));
-  console.log(allReviews.length);
   const prompt = `Analyze the following HTML and scrape all text value for the review section, review title, body, rating, and reviewer in the following JSON format:
   
   {
@@ -243,15 +239,19 @@ and nextBtn in the following JSON format:
 HTML content: ${scrappedHTML}
 response only in json 
 `;
-// HTML url: ${url}
-
+  // HTML url: ${url}
 
   let response = await gemini_prompt(prompt);
-  return JSON.parse(response)
+  return JSON.parse(response);
 }
 function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
+const parseBoolean = (value) => {
+  if (value === "true") return true;
+  if (value === "false") return false;
+  return false;
+};
 module.exports = {
   sleep,
   readJson,
@@ -260,5 +260,6 @@ module.exports = {
   scrapeByCssSelector,
   scrapeReviews,
   scrapeReviewsByLLM,
-  getCSSByLLM
+  getCSSByLLM,
+  parseBoolean,
 };

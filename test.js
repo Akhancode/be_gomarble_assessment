@@ -4,6 +4,8 @@ const { gemini_prompt, openAi_prompt } = require("./src/utils/llm/helper");
 const { sleep } = require("./src/utils/helper/helperFunction");
 const cheerio = require("cheerio");
 const fs = require("fs");
+
+//functions------
 const cleaningHtml = async (page) => {
   const htmlContent = await page.content();
   const $ = cheerio.load(htmlContent);
@@ -82,8 +84,6 @@ async function scrapeByCssSelector(page, selectors, url) {
 
   return reviewsData;
 }
-
-//functions------
 const getAllElementRelatesToSearch = async (
   page,
   searchArr = ["see all reviews", "see more reviews", "more reviews"]
@@ -186,9 +186,6 @@ const closeOverlay = async (page, closeButtonSelectors) => {
 
 // main function------
 async function fetchHTML(url) {
-  //ad block extension
-  const extensionPath = path.join(__dirname, "MyExtension");
-
   const browser = await puppeteer.launch({
     headless: false,
   });
@@ -218,8 +215,7 @@ async function fetchHTML(url) {
 
     // Saving to txt file HTML
     // fs.writeFileSync("cleaned_output.txt", String(reviewElements), "utf8");
-    
-    
+
     console.log("scrapped html content of review related elements ✅ ");
     let promptForFindingSelectors = `
         Analyze the following HTML in array of html and return Most accurate CSS selectors by tag or class or id or any attribute for the following in JSON format:
@@ -325,7 +321,7 @@ async function fetchHTML(url) {
 
     console.log("Scrapped review Data ✅ ");
     console.log(reviewFullData);
-    sleep(10000);
+    return reviewFullData;
 
     if (reviewFullData.length == 0) {
       console.log("rerunning the selector finder");
@@ -399,6 +395,7 @@ async function fetchHTML(url) {
     // console.log(html)
   } catch (error) {
     console.log(error);
+    return error;
   } finally {
     await browser.close();
   }
@@ -409,7 +406,7 @@ async function fetchHTML(url) {
 // fetchHTML(
 //   "https://bhumi.com.au/products/organic-cotton-flannelette-sheet-set-plaid"
 // );
-fetchHTML("https://lyfefuel.com/products/essentials-nutrition-shake");
+// fetchHTML("https://lyfefuel.com/products/essentials-nutrition-shake");
 
 // fetchHTML(
 //   "https://www.flipkart.com/walkers-electronic-7in1-mobile-soldering-iron-equipment-tool-machine-combo-kit-set-flux-paste-5-meter-wire-25-w-simple/product-reviews/itm7f26d5189f1c4?pid=SOIFZUNFRYSMGVPX&lid=LSTSOIFZUNFRYSMGVPXOLEX1C&marketplace=FLIPKART"

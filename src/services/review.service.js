@@ -1,260 +1,362 @@
-const OpenAI = require("openai");
-const productsData = require("../utils/data/products.json");
-const {
-  DatabaseError,
-  ValidationError,
-  NotFoundError,
-} = require("../utils/errors/error");
-
-const fs = require("fs");
+const puppeteer = require("puppeteer");
 const path = require("path");
-const {
-  readJson,
-  writeJson,
-  scrapeHTML,
-  scrapeByCssSelector,
-  scrapePagination,
-  scrapeReviews,
-  scrapeReviewsByLLM,
-  getCSSByLLM,
-} = require("../utils/helper/helperFunction");
-const { default: axios } = require("axios");
-const { gemini_prompt } = require("../utils/llm/helper");
-const { json } = require("body-parser");
-const { bhumi_com } = require("../utils/constants/testData");
+
 const cheerio = require("cheerio");
+const fs = require("fs");
+const { sleep } = require("../utils/helper/helperFunction");
+const { gemini_prompt } = require("../utils/llm/helper");
+const {
+  generate_promptForFindingSelectors,
+  generate_promptForScrappingFromReviewBlock,
+} = require("../utils/prompts/prompts");
 
-const productsFilePath = path.join(__dirname, "../utils/data/products.json");
-exports.createProduct = async (productData) => {
-  if (!productData.name) {
-    throw new ValidationError("Product Name is required.");
-  }
-  if (!productData.price) {
-    throw new ValidationError("Product price is required.");
-  }
+//functions------
+const cleaningHtml = async (page) => {
+  const htmlContent = await page.content();
+  const $ = cheerio.load(htmlContent);
 
-  try {
-    const productsData = readJson(productsFilePath);
-    productsData.push(productData);
-    writeJson(productsData, productsFilePath);
-    return {
-      message: `created new product `,
-      success: true,
-    };
-  } catch (error) {
-    if (error instanceof NotFoundError || error instanceof ValidationError) {
-      throw error;
-    } else {
-      throw new DatabaseError("Error creating user.");
+  // Remove all <script> and <style> tags
+  $("script").remove();
+  $("style").remove();
+  $("img").remove();
+
+  // Optionally remove other unwanted elements (e.g., ads, popups)
+  $(".ad").remove(); // Example class for ads
+  $(".popup").remove(); // Example class for popups
+
+  // Return the cleaned HTML
+  const cleanedHtml = $.html().replace(/\s\s+/g, " ").replace(/\n/g, "").trim();
+
+  return cleanedHtml;
+};
+const checkElementIsBlocked = async (page, targetSelector) => {
+  const isBlocked = await page.evaluate((targetSelector) => {
+    const targetElement = document.querySelector(targetSelector);
+    if (!targetElement) {
+      return false; // Element doesn't exist
     }
-  }
+
+    // Get the bounding box of the target element
+    const { top, left, width, height } = targetElement.getBoundingClientRect();
+
+    // Get the element at the center of the target element
+    const centerX = left + width / 2;
+    const centerY = top + height / 2;
+    const elementFromPoint = document.elementFromPoint(centerX, centerY);
+
+    // Check if the element at the center of the target element is the target element itself
+    return elementFromPoint !== targetElement;
+  }, targetSelector);
+  return isBlocked;
 };
 
-exports.getProducts = async () => {
-  try {
-    const productsData = readJson(productsFilePath);
-    return productsData;
-  } catch (error) {
-    throw new DatabaseError("Error fetching products.");
+async function scrapeByCssSelector(page, selectors, url) {
+  // Launch Puppeteer and open a new browser page
+  if (!page) {
+    const browser = await puppeteer.launch({ headless: false });
+    const page = await browser.newPage();
+    await page.goto(url, { waitUntil: "domcontentloaded" });
   }
-};
-exports.getProductById = async (_productId) => {
-  try {
-    const productId = Number(_productId);
-    const productsData = readJson(productsFilePath);
-    var foundIndex = productsData.findIndex(
-      (product) => product.id == productId
+
+  const reviewsData = await page.evaluate((selectors) => {
+    // Get all review elements
+    const reviewElements = document.querySelectorAll(
+      `${selectors.reviewAll} ${selectors.review}`
     );
-    const resultData = productsData[foundIndex];
-    if (!resultData) {
-      throw new NotFoundError("No product found by this id");
-    }
-    return resultData;
-  } catch (error) {
-    if (error instanceof NotFoundError) {
-      throw error;
-    } else {
-      throw new DatabaseError("Error fetching products.");
-    }
+
+    // Loop through each review element and extract data
+    const reviewsArray = Array.from(reviewElements).map((reviewElement) => {
+      const title =
+        reviewElement.querySelector(selectors.title)?.innerText || "No Title";
+      const body =
+        reviewElement.querySelector(selectors.body)?.innerText || "No Content";
+      const rating =
+        reviewElement.querySelector(selectors.rating)?.innerText || "No Rating";
+      const reviewer =
+        reviewElement.querySelector(selectors.reviewer)?.innerText ||
+        "Anonymous";
+
+      return {
+        title,
+        body,
+        rating,
+        reviewer,
+      };
+    });
+
+    return reviewsArray;
+  }, selectors);
+
+  return reviewsData;
+}
+async function scrapeByLLMByReviewTile(page, selectors, url) {
+  // Launch Puppeteer and open a new browser page
+  if (!page) {
+    const browser = await puppeteer.launch({ headless: false });
+    const page = await browser.newPage();
+    await page.goto(url, { waitUntil: "domcontentloaded" });
   }
-};
-exports.updateProductById = async (_productId, updateData) => {
-  try {
-    const productId = Number(_productId);
-    const productsData = readJson(productsFilePath);
-    var foundIndex = productsData.findIndex(
-      (product) => product.id == productId
+
+  const reviewsData = await page.evaluate((selectors) => {
+    // Get all review elements
+    const reviewElements = document.querySelectorAll(
+      `${selectors.reviewAll} ${selectors.review}`
     );
-    const resultData = productsData[foundIndex];
 
-    if (!resultData) {
-      throw new NotFoundError("No product found by this id");
-    }
-    let updatedProductDetails = { ...resultData, ...updateData };
-    productsData[foundIndex] = updatedProductDetails;
-    writeJson(productsData, productsFilePath);
+    // Loop through each review element and extract data
+    const reviewsArray = Array.from(reviewElements).map((reviewElement) => {
+      // const title =
+      //   reviewElement.querySelector(selectors.title)?.innerText || "No Title";
+      // const body =
+      //   reviewElement.querySelector(selectors.body)?.innerText || "No Content";
+      // const rating =
+      //   reviewElement.querySelector(selectors.rating)?.innerText || "No Rating";
+      // const reviewer =
+      //   reviewElement.querySelector(selectors.reviewer)?.innerText ||
+      //   "Anonymous";
+      const reviewBlock = document.querySelector(selectors.review);
+      const reviewBlockHtml = reviewBlock ? reviewBlock.outerHTML : null;
+      return {
+        htmlBlock: reviewBlockHtml,
+      };
+    });
 
-    return updatedProductDetails;
-  } catch (error) {
-    if (error instanceof NotFoundError || error instanceof ValidationError) {
-      throw error;
-    } else {
-      throw new DatabaseError("Error updating  product.");
+    return reviewsArray;
+  }, selectors);
+
+  return reviewsData;
+}
+const getAllElementRelatesToSearch = async (
+  page,
+  searchArr = ["see all reviews", "see more reviews", "more reviews"]
+) => {
+  const elementsRelatedToSeeMoreReviesArr = await page.evaluate((searchArr) => {
+    // Select all elements to inspect, common containers, or the body tag
+    const elements = document.querySelectorAll(
+      "div, section, article, body,a, button, div, span"
+    ); // Can adjust based on page structure
+    const matchingGrandparents = [];
+
+    elements.forEach((el) => {
+      // Check if any of the descendant elements contain the word "review"
+      const text = el.innerText.toLowerCase().trim();
+      const options = searchArr;
+      if (options.includes(text)) {
+        // If it contains "review", get the grandparent or higher-level element
+        matchingGrandparents.push(el.outerHTML);
+      }
+    });
+    return matchingGrandparents;
+  }, searchArr);
+  return elementsRelatedToSeeMoreReviesArr;
+};
+const getAllReviewAttributeElement = async (page) => {
+  let reviewElements = await page.evaluate(() => {
+    // Use querySelectorAll to find all elements whose id, class, or attributes contain "review"
+    const reviewElements = document.querySelectorAll(`
+                    [id*="review"],
+                    [class*="review"],
+                    [data-*="review"],
+                    [name*="review"]
+                `);
+
+    // Convert NodeList to an array and return the outer HTML of each element
+    return Array.from(reviewElements).map((element) => element.outerHTML);
+  });
+  return reviewElements;
+};
+const getAllPaginationAttributeElement = async (page) => {
+  let reviewElements = await page.evaluate(() => {
+    // Use querySelectorAll to find all elements whose id, class, or attributes contain "review"
+    const reviewElements = document.querySelectorAll(`
+                    [id*="pagina"],
+                    [id*="page"],
+                    [class*="pagina"],
+                    [class*="page"],
+                    [data-*="pagina"],
+                    [data-*="page"],
+                    [name*="pagina"],
+                    [name*="page"]
+                `);
+
+    // Convert NodeList to an array and return the outer HTML of each element
+    return Array.from(reviewElements).map((element) => element.outerHTML);
+  });
+  return reviewElements;
+};
+const scrollToBottom = async (page) => {
+  await page.evaluate(async () => {
+    await new Promise((resolve) => {
+      let totalHeight = 0;
+      const distance = 100;
+      const timer = setInterval(() => {
+        window.scrollBy(0, distance);
+        totalHeight += distance;
+
+        if (totalHeight >= document.body.scrollHeight) {
+          clearInterval(timer);
+          resolve();
+        }
+      }, 100);
+    });
+  });
+};
+const closeOverlay = async (page, closeButtonSelectors) => {
+  for (const selector of closeButtonSelectors) {
+    try {
+      const isVisible = await page.evaluate((selector) => {
+        const element = document.querySelector(selector);
+        return element
+          ? element.offsetWidth > 0 || element.offsetHeight > 0
+          : false;
+      }, selector);
+
+      if (isVisible) {
+        // await page.waitForSelector(selector);
+        await page.click(selector);
+        console.log("clicked close buttonn.....", selector);
+        // Wait for the overlay to be removed or hidden
+        continue; // Exit the loop after closing the first found overlay
+      }
+    } catch (error) {
+      // Ignore errors (e.g., element not found or not clickable)
+      console.warn(`Error handling selector ${selector}: ${error.message}`);
+      continue;
     }
   }
 };
-exports.deleteProductById = async (_productId) => {
+
+// main function------
+async function scrapePage(url, scapeByLLM = false) {
+  const browser = await puppeteer.launch({
+    headless: false,
+  });
   try {
-    const productId = Number(_productId);
-    const productsData = readJson(productsFilePath);
-    var foundIndex = productsData.findIndex(
-      (product) => product.id == productId
+    scapeByLLM
+      ? console.log("Initiated scrapping type  by 'LLM' ⌛ ")
+      : console.log("Initiated scrapping type  by 'CSS SELECTORS' ⌛ ");
+    const arrOfNextPageSelectors = [
+      ".jdgm-paginate__next-page",
+      '.yotpo-reviews-pagination-item[aria-label="Goto next page"]',
+    ];
+    const arrOfPopUpCloseButtons = [
+      `[data-testid="CloseIcon"]`,
+      `button.klaviyo-close-form.kl-private-reset-css-Xuajs1[aria-label="Close dialog"]`,
+      ".store-selection-popup--inner .store-selection-popup--close",
+      `[data-testid="CloseIcon"]`,
+      `button[aria-label="Close dialog"]`,
+      `[data-testid*="Close"]`,
+    ];
+    const page = await browser.newPage();
+    await page.goto(url, { waitUntil: "domcontentloaded", timeout: 50000 });
+    await scrollToBottom(page);
+    await closeOverlay(page, arrOfPopUpCloseButtons);
+
+    //getting All elements related review Attribute
+    let reviewElements = await cleaningHtml(page);
+
+    // let pageElements = await getAllPaginationAttributeElement(page);
+
+    // Saving to txt file HTML
+    // fs.writeFileSync("cleaned_output.txt", String(reviewElements), "utf8");
+
+    console.log("scrapped html content of review related elements ✅ ");
+    let promptForFindingSelectors = generate_promptForFindingSelectors(
+      reviewElements,
+      arrOfNextPageSelectors
     );
-    const resultData = productsData[foundIndex];
-    if (!resultData) {
-      throw new NotFoundError("No product found by this id / already deleted");
+
+    console.log("Detecting selectors using Gemini LLM ... ");
+    const cssSelectors = await gemini_prompt(promptForFindingSelectors);
+
+    console.log("Generated selectors using LLM ✅ ");
+    const parsedCssSelectors = JSON.parse(cssSelectors);
+    console.log(parsedCssSelectors);
+
+    let reviewFullData = [];
+    let nextPageExists = true;
+    var lastPageCount = 0;
+    let prevData;
+    let currPageNo = 1;
+
+
+    // Pagination handling
+    while (nextPageExists) {
+      const reviewData = scapeByLLM
+        ? await scrapeByLLMByReviewTile(page, parsedCssSelectors)
+        : await scrapeByCssSelector(page, parsedCssSelectors);
+      if (JSON.stringify(prevData) == JSON.stringify(reviewData)) {
+        if (currPageNo >= Number(parsedCssSelectors.totalNoOfPages)) {
+          console.log("Finished ... return data ");
+          nextPageExists = false;
+        }
+      }
+      prevData = reviewData;
+      reviewFullData = [...reviewFullData, ...reviewData];
+      currPageNo++
+      try {
+        const btnNextPage = await page.$(parsedCssSelectors.paginationNextBtn);
+        if (!btnNextPage) {
+          console.log("btnNextPage not found");
+          nextPageExists = null;
+        } else {
+          // Check if the btnNextPage is disabled
+          const isDisabled = await page.$eval(
+            parsedCssSelectors.paginationNextBtn,
+            (el) => {
+              return (
+                el.hasAttribute("disabled") ||
+                el.disabled ||
+                el.classList.contains("disabled")
+              );
+            }
+          );
+          if (isDisabled && lastPageCount == 0) {
+            lastPageCount = lastPageCount + 1;
+            continue;
+          }
+
+          if (isDisabled && lastPageCount > 0) {
+            console.log("Element is disabled");
+            nextPageExists = null;
+          } else {
+            console.log("Element is enabled, clicking...");
+          }
+          await btnNextPage.click();
+        }
+
+        await sleep(1000);
+      } catch (error) {
+        console.log("retrying to click");
+        const isBlocked = await checkElementIsBlocked(
+          page,
+          parsedCssSelectors.paginationNextBtn
+        );
+        console.log("isBlocked by overlay : ", isBlocked);
+        await closeOverlay(page, arrOfPopUpCloseButtons);
+      }
     }
 
-    productsData.splice(foundIndex, 1);
-    writeJson(productsData, productsFilePath);
-
-    return {
-      message: "Deleted Successfully . ",
-    };
-  } catch (error) {
-    if (error instanceof NotFoundError || error instanceof ValidationError) {
-      throw error;
+    console.log("Scrapped review Data ✅ ");
+    if (scapeByLLM) {
+      const prompt = generate_promptForScrappingFromReviewBlock(reviewFullData);
+      let response = JSON.parse(await gemini_prompt(prompt));
+      console.log(response);
+      return response;
     } else {
-      throw new DatabaseError("Error creating user.");
-      throw new DatabaseError("Error updating  product.");
+      console.log(reviewFullData);
+      return reviewFullData;
     }
-  }
-};
-
-//new
-exports.getProductReviews = async (url) => {
-  try {
-    // const productsData = "html"
-
-    if (!url) {
-      url = `https://lyfefuel.com/products/essentials-nutrition-shake`;
-    }
-    const scrappedHTML = await scrapeHTML(url);
-    const prompt = `Analyze the following HTML and return CSS selectors for the review section, review title, body, rating, and reviewer in the following JSON format:
-{
-  "reviewAll": "<CSS selector  for all review parent container which is direct >",
-  "review": "<CSS selector for each review container >",
-  "title": "<CSS selector for review title content >",
-  "body": "<CSS selector for review body content >",
-  "rating": "<CSS selector for review rating content >",
-  "reviewer": "<CSS selector for reviewer name content >",
-  "nextBtn": "<CSS selector for next button in pagination might be label as next page or something . >",
-  "nextBtnTxt": "<Text content for next button in pagination if no text existing give value not existing or svg >",
-
-  }
-HTML content: ${scrappedHTML}`;
-
-    let response = await gemini_prompt(prompt);
-    // response = response.replace("```json", "").replace("```", "");
-    let selectors = JSON.parse(response);
-    console.log("selectors", selectors);
-    return selectors;
-    const result = await scrapeByCssSelector(url, selectors);
-    console.log(result);
-    // const openai = new OpenAI({
-    //   apiKey:process.env.OPENAI_API_KEY,
-    // });
-    // console.log(process.env.OPENAI_API_KEY)
-    // const response = await openai.completions.create({
-    //   messages: [{ role: 'user', content: 'Say this is a test' }],
-    //   model: 'gpt-3.5-turbo',
-    // });
-    // console.log(chatCompletion);
-
-    return result;
   } catch (error) {
-    throw error;
+    console.log(error);
+    return error;
+  } finally {
+    await browser.close();
   }
+}
+
+//new - servie
+exports.NewScrapeForProductReviews = async (url, scapeByLLM) => {
+  const data = await scrapePage(url, scapeByLLM);
+  return data;
 };
-exports.testProductReviews = async (url) => {
-  try {
-    // const productsData = "html"
-
-    if (!url) {
-      url = `https://lyfefuel.com/products/essentials-nutrition-shake`;
-    }
-
-    const htmlContent = await scrapeHTML(url);
-    const $ = cheerio.load(htmlContent);
-
-   
-
-    
-
-
-
-    //get html block for reviews 
-    // const response =  await gemini_prompt(`only return html block for only review from this : ${cleanedBody}`)
-    //  const re = await gemini_prompt(`only return css selector for  reviewList , reviewContent ,reviewAuthor in json FORMAT like 
-    //   {
-    //   reviewList:<css selector for container element that wrapped all reviews>,
-    //   reviewContent:<css selector for text content or body of each review element >,
-    //   reviewAuthor:<css selector for author name  of each review element >,
-         
-    // reviewContent:<text value  for content or body of each review element >,
-    // reviewAuthor:<text value for author name  of each review element >,
-    //   }
-      // from this : ${cleanedBody}`)
-     const selectors = await gemini_prompt(`find all reviews in the page return in json array of object each object will be each review FORMAT like 
-      {
-
-      reviewList:<css selector for container or list  element that wrapped all reviews elements .>,
-      
-      reviewContentCssSelector:<css selector for text content or body of each review element >,
- 
-      reviewAuthorCssSelector:<css selector for author name  of each review element >,
-     }
-      from this : ${htmlContent} response should only be in JSON format array of object .`)
-
-      const re = await gemini_prompt(`
-        find all reviews from inside of css selector = ${selectors.reviewList} and give me response in this format 
-        [
-        {
-        reviewContent:<text value  for content or body of each review element >,
-        reviewAuthor:<text value for author name  of each review element >,
-        reviewRating:<text value for review rating  of each review element >,
-        },....
-        ]
-
-        from this : ${htmlContent} response should only be in JSON format array of object .
-        `)
-    return JSON.parse(re);
-  } catch (error) {
-    throw error;
-  }
-};
-// exports.testProductReviews = async (url) => {
-//   try {
-//     // const productsData = "html"
-
-//     if (!url) {
-//       url = `https://lyfefuel.com/products/essentials-nutrition-shake`;
-//     }
-
-//     const selectors  = await getCSSByLLM(url)
-//     console.log("selectors",selectors)
-//     return selectors
-//     // const response = await scrapeReviews(url,selectors)
-//     // console.log("response",response)
-//     return response
-//     // const page = bhumi_com
-//     // const scrappedHTML = await scrapeHTML(url);
-//     // const scrappedHTML = await scrapeReviews(url);
-//     // const scrappedHTML = await scrapeReviewsByLLM(url);
-//     // const result = await scrapeByCssSelector(page.link,page.cssSelectors)
-//     // console.log(result)
-//     return scrappedHTML;
-//   } catch (error) {
-//     throw error;
-//   }
-// };
