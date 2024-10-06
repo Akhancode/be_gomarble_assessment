@@ -28,9 +28,9 @@ Additionally, an optional multi-process handling feature is integrated using Nod
 
 - Scrapping reviews from product review page [required product review page ]
 - Gemini 1.5 Flash model (LLM) is used to dynamically detect CSS selectors
-- Two versions of the scraping process [v1 and v2]
+- [Two versions](#versions) of the scraping process [v1 and v2]
 - Pagination is handled with custom logic
-- Optional Feauture - Multi-process handling feature is integrated using Node.js child processes.
+- Optional Feauture [Multi-process](#multi-process)  - handling feature is integrated using Node.js child processes.
 - Interactive UI built with React.js
 - Deployed Backend and made CI-CD by utilizing github actions .
 
@@ -70,8 +70,17 @@ Additionally, an optional multi-process handling feature is integrated using Nod
     ```
 
 ## Usage
+ - ### versions
+     Two Versions of Scrapping have been implemented
+     - **v1**
+           This version will scrape data utilizing relevant CSS selectors, which are identified by a language model (LLM) and by using puppeteer methods we scrape the data accordingly.
+     - **v2**
+           This version will utilize a large language model (LLM) to scrape data from the filtered html review block which is collected in format of array of review block .
+           These block are identified by LLM in each iteration of looping of Pagination .
 
-After following the installation steps, open your browser and navigate to `localhost:8501` to access the SummarizeX application. Enter your OpenAI API key and the content or topic you want summarized. Click the "Generate Summary" button to get the summarized content.
+ - ### Multi-process
+     Node.js operates on a single-threaded model, which can lead to performance bottlenecks. By utilizing child processes, web scraping tasks are delegated to separate processes, enhancing              performance and preventing blocking in the main application workflow.
+     
 
 ## API Reference
 
@@ -92,16 +101,6 @@ Redirect to there for API details, testing endpoints .  </br>
 
 
 
-
-
-## License
-
-This project is licensed under the [MIT License](LICENSE).
-
-## Acknowledgements
-
-- [Streamlit](https://streamlit.io/)
-- [OpenAI](https://openai.com/)
 
 ## Contact Me
 
