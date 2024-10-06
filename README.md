@@ -79,8 +79,8 @@ Additionally, an optional multi-process handling feature is integrated using Nod
 </br>
   <img src="https://static1.smartbear.co/swagger/media/assets/images/swagger_logo.svg" alt="Streamlit App" width="200"/>
 </br>
-The API documentation, including in Swagger docs, is available at 
-
+The API documentation, including in Swagger docs, is available at **localhost:9000/api-docs** 
+select the server in swagger accordingly 
 Redirect to there for API details, testing endpoints .  </br>
 
 
