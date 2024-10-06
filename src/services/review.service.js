@@ -9,6 +9,7 @@ const {
   generate_promptForFindingSelectors,
   generate_promptForScrappingFromReviewBlock,
 } = require("../utils/prompts/prompts");
+const { fork } = require("child_process");
 
 const headlessValue = parseBoolean(process.env.ISHEADLESS);
 //functions------
@@ -238,7 +239,7 @@ async function scrapePage(url, scapeByLLM = false) {
   const pptOption = {
     headless: headlessValue, // Set to true for headless mode
   };
-  
+
   const browser = await puppeteer.launch(pptOption);
   try {
     scapeByLLM
@@ -364,8 +365,40 @@ async function scrapePage(url, scapeByLLM = false) {
   }
 }
 
-//new - servie
-exports.NewScrapeForProductReviews = async (url, scapeByLLM) => {
+//new - service
+const NewScrapeForProductReviews = async (url, scapeByLLM) => {
   const data = await scrapePage(url, scapeByLLM);
   return data;
+};
+const NewScrapeForProductReviewsWithChild = async (url, scapeByLLM) => {
+  console.log("multi threading ......");
+  return new Promise((resolve, reject) => {
+    const child = fork(path.join(__dirname, "../workers/scrapeWorker.js"), [
+      url,
+      scapeByLLM,
+    ]);
+
+    // Handle messages from child process
+    child.on("message", (message) => {
+      resolve(message);
+    });
+
+    // Handle errors
+    child.on("error", (error) => {
+      reject(error);
+    });
+
+    // Handle child process exit
+    child.on("exit", (code) => {
+      if (code !== 0) {
+        reject(new Error(`Child process exited with code ${code}`));
+      }
+    });
+  });
+};
+
+module.exports = {
+  scrapePage,
+  NewScrapeForProductReviewsWithChild,
+  NewScrapeForProductReviews,
 };

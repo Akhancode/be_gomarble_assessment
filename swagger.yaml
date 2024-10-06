@@ -39,7 +39,13 @@ paths:
           name: scrapeByLLM
           type: string
           required: false
-          description: product link  
+          description: scrape by LLM  
+          example: false
+        - in: query
+          name: multiProcess
+          type: string
+          required: false
+          description: multi threading process  
           example: false
       responses:
         '200':    # status code
