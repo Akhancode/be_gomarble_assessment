@@ -25,6 +25,6 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
     - run: npm ci
-    - run: npm start
+    # - run: npm start
     
     # - run: pm2 restart gomarble_be
