@@ -13,8 +13,8 @@ Develop an API server capable of extracting reviews information from any given p
 - [WorkFlow](#workflow)
 - [Features](#features)
 - [Installation](#installation)
-- [Usage](#usage)
 - [API Reference](#api-reference)
+- [Usage](#usage)
 - [Deployment](#deployment)
 - [FrontEnd](#frontend)
 
