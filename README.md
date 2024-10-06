@@ -14,6 +14,8 @@ Develop an API server capable of extracting reviews information from any given p
 - [Installation](#installation)
 - [Usage](#usage)
 - [API Reference](#api-reference)
+- [Deployment](#deployment)
+- [FrontEnd](#frontend)
 
 
 
@@ -96,6 +98,29 @@ Redirect to there for API details, testing endpoints .  </br>
 - Deployed api  [Deployed server api doc ](http://gomarble-assessment.centralindia.cloudapp.azure.com/api-docs).
 
 - Localhost api  [http://localhost:9000/api-docs](http://localhost:9000/api-docs)
+
+
+
+## Deployment
+
+### PM2
+Used PM2 is a process manager for Node.js applications. It helps keep your app running smoothly by automatically restarting it if it crashes.This manage multiple applications and monitor their performance easily.
+
+### Nginx
+Used Nginx is a web server that can also be used as a reverse proxy. It helps serve your application to users by handling incoming requests, distributing them to your Node.js app, and managing static files.
+
+### GitHub Actions
+Used GitHub Actions to automates workflows directly from your GitHub repository. You can set it up to automatically deploy your application whenever you push changes to your code, making the deployment process efficient and consistent ,Basically achieving CI CD .
+
+### Azure VM
+Used Azure Virtual Machine , It provides the resources needed to host your Node.js app.  ensuring that your application runs smoothly and efficiently.
+
+
+
+## FrontEnd
+   ### Repository for Front End [here](https://github.com/Akhancode/fe_gomarble_assessment). 
+
+
 
 
 
