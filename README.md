@@ -10,6 +10,7 @@ Develop an API server capable of extracting reviews information from any given p
 ## Table of Contents
 
 - [Introduction](#introduction)
+- [WorkFlow](#workflow)
 - [Features](#features)
 - [Installation](#installation)
 - [Usage](#usage)
@@ -23,6 +24,10 @@ Develop an API server capable of extracting reviews information from any given p
 
 >This Node.js project utilizes Puppeteer for scraping review content from given product review URLs. Pagination is handled with custom logic and Gemini 1.5 Flash model (LLM) is used to dynamically detect CSS selectors for the required elements using a specific prompt. Two versions of the scraping process were implemented: one using CSS selectors and another utilizing the LLM to scrape the HTML block of review lists, filtered by selector detection.
 Additionally, an optional multi-process handling feature is integrated using Node.js child processes to optimize scraping performance. API documentation is provided via Swagger, and an interactive frontend UI is built with React.js. Both the backend and frontend are successfully deployed on Azure.
+
+## Workflow
+   - Please have a look at Diagram   [download](https://drive.google.com/file/d/16xI4IUSYHIKe5KCHf8CZLpBJZ9DXw9AN/view?usp=drive_link)
+
 
 ## Features
 
