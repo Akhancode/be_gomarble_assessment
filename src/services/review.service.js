@@ -76,34 +76,14 @@ async function scrapePage(url, scapeByLLM = false) {
       ...parsedCssSelectors.popCloseBtnsArr,
     ];
     if (url.includes("lyfefuel.com")) {
-      console.log(
-        "-----------------------------------------------------lyfefuel"
-      );
       const rall = await page.$(".r-view-all");
 
       await scrollIntoELement(rall, page);
       await page.click(".r-view-all");
-      console.log("scrolled and clicked ");
       parsedCssSelectors["paginationNextBtn"] =
         ".isActive.R-PaginationControls__item.Pagination__item--outline+div";
-
-      // await sleep(10000)
-      console.log("parsedCssSelectors", parsedCssSelectors);
-      // while(true){
-      //   const next = await page.$(".isActive.R-PaginationControls__item.Pagination__item--outline+div");
-      //   await sleep(1000)
-      //   await scrollIntoELement(next, page);
-      //   await next.click()
-      // }
-
-      // return;
     }
-    // if (url.includes("lyfefuel.com")) {
-    //   const rall = await page.$(".r-view-all");
-    //   await scrollIntoELement(rall, page);
-    //   await page.click(".r-view-all");
-    //   parsedCssSelectors["paginationNextBtn"] = ".isActive.R-PaginationControls__item.Pagination__item--outline+div"
-    // }
+
     let reviewFullData = [];
     let nextPageExists = true;
     var lastPageCount = 0;
@@ -130,7 +110,7 @@ async function scrapePage(url, scapeByLLM = false) {
       try {
         const btnNextPage = await page.$(parsedCssSelectors.paginationNextBtn);
         await scrollIntoELement(btnNextPage, page);
-    
+
         if (!btnNextPage) {
           console.log("btnNextPage not found");
           nextPageExists = null;
@@ -159,7 +139,7 @@ async function scrapePage(url, scapeByLLM = false) {
           }
           await btnNextPage.click();
         }
-        await sleep( 800);
+        await sleep(800);
       } catch (error) {
         console.log("retrying to click");
         const isBlocked = await checkElementIsBlocked(
