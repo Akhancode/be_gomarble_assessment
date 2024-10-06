@@ -68,25 +68,12 @@ Additionally, an optional multi-process handling feature is integrated using Nod
 
     Get the Backend env secrets from  [here](https://drive.google.com/file/d/1I9onZH3cmeFcaOsPis1-FQkp-g6rguvL/view?usp=sharing). Kindly paste accordingly.
      
-4. Run the application:
+5. Run the application:
 
     ```bash
     npm start
     ```
-
-## Usage
- - ### Versions
-     Two Versions of Scrapping have been implemented
-     - **v1**
-           This version will scrape data utilizing relevant CSS selectors, which are identified by a language model (LLM) and by using puppeteer methods we scrape the data accordingly.
-     - **v2**
-           This version will utilize a large language model (LLM) to scrape data from the filtered html review block which is collected in format of array of review block .
-           These block are identified by LLM in each iteration of looping of Pagination .
-
- - ### Multi-process
-     Node.js operates on a single-threaded model, which can lead to performance bottlenecks. By utilizing child processes, web scraping tasks are delegated to separate processes, enhancing              performance and preventing blocking in the main application workflow.
-     
-
+    
 ## API Reference
 
 </br>
@@ -102,6 +89,21 @@ Redirect to there for API details, testing endpoints .  </br>
 - Localhost api  [http://localhost:9000/api-docs](http://localhost:9000/api-docs)
 
  ![swagger-api-doc](./assessment/screenshots/swagger.png)
+
+
+
+## Usage
+ - ### Versions
+     Two Versions of Scrapping have been implemented
+     - **v1**
+           This version will scrape data utilizing relevant CSS selectors, which are identified by a language model (LLM) and by using puppeteer methods we scrape the data accordingly.
+     - **v2**
+           This version will utilize a large language model (LLM) to scrape data from the filtered html review block which is collected in format of array of review block .
+           These block are identified by LLM in each iteration of looping of Pagination .
+
+ - ### Multi-process
+     Node.js operates on a single-threaded model, which can lead to performance bottlenecks. By utilizing child processes, web scraping tasks are delegated to separate processes, enhancing              performance and preventing blocking in the main application workflow.
+     
 
 
 ## Project Structure
