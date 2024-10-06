@@ -17,6 +17,7 @@ const {
   scrapeByLLMByReviewTile,
   scrollToBottom,
   closeOverlay,
+  scrollIntoELement,
 } = require("../utils/helper/scraperHelperFunctions");
 const headlessValue = parseBoolean(process.env.ISHEADLESS);
 //functions------
@@ -40,7 +41,7 @@ async function scrapePage(url, scapeByLLM = false) {
       `[data-testid="CloseIcon"]`,
       `button.klaviyo-close-form.kl-private-reset-css-Xuajs1[aria-label="Close dialog"]`,
       ".store-selection-popup--inner .store-selection-popup--close",
-      
+
       `[data-testid="CloseIcon"]`,
       `button[aria-label="Close dialog"]`,
       `[data-testid*="Close"]`,
@@ -70,8 +71,39 @@ async function scrapePage(url, scapeByLLM = false) {
     console.log("Generated selectors using LLM ✅ ");
     const parsedCssSelectors = JSON.parse(cssSelectors);
     console.log(parsedCssSelectors);
-    arrOfPopUpCloseButtons = [...arrOfPopUpCloseButtons,...parsedCssSelectors.popCloseBtnsArr]
+    arrOfPopUpCloseButtons = [
+      ...arrOfPopUpCloseButtons,
+      ...parsedCssSelectors.popCloseBtnsArr,
+    ];
+    if (url.includes("lyfefuel.com")) {
+      console.log(
+        "-----------------------------------------------------lyfefuel"
+      );
+      const rall = await page.$(".r-view-all");
 
+      await scrollIntoELement(rall, page);
+      await page.click(".r-view-all");
+      console.log("scrolled and clicked ");
+      parsedCssSelectors["paginationNextBtn"] =
+        ".isActive.R-PaginationControls__item.Pagination__item--outline+div";
+
+      // await sleep(10000)
+      console.log("parsedCssSelectors", parsedCssSelectors);
+      // while(true){
+      //   const next = await page.$(".isActive.R-PaginationControls__item.Pagination__item--outline+div");
+      //   await sleep(1000)
+      //   await scrollIntoELement(next, page);
+      //   await next.click()
+      // }
+
+      // return;
+    }
+    // if (url.includes("lyfefuel.com")) {
+    //   const rall = await page.$(".r-view-all");
+    //   await scrollIntoELement(rall, page);
+    //   await page.click(".r-view-all");
+    //   parsedCssSelectors["paginationNextBtn"] = ".isActive.R-PaginationControls__item.Pagination__item--outline+div"
+    // }
     let reviewFullData = [];
     let nextPageExists = true;
     var lastPageCount = 0;
@@ -84,8 +116,10 @@ async function scrapePage(url, scapeByLLM = false) {
         ? await scrapeByLLMByReviewTile(page, parsedCssSelectors)
         : await scrapeByCssSelector(page, parsedCssSelectors);
       if (prevData.includes(JSON.stringify(reviewData))) {
-        if (currPageNo > Number(parsedCssSelectors.totalNoOfPages)) {
-          console.log("Finished ... return data ");
+        console.log("first", !url.includes("lyfefuel.com"), url);
+        let pageOver = currPageNo > Number(parsedCssSelectors.totalNoOfPages);
+        if (pageOver && !url.includes("lyfefuel.com")) {
+          console.log("Finished ... return data duplicate");
           nextPageExists = false;
           prevData = [];
         }
@@ -95,6 +129,8 @@ async function scrapePage(url, scapeByLLM = false) {
       currPageNo++;
       try {
         const btnNextPage = await page.$(parsedCssSelectors.paginationNextBtn);
+        await scrollIntoELement(btnNextPage, page);
+    
         if (!btnNextPage) {
           console.log("btnNextPage not found");
           nextPageExists = null;
@@ -123,8 +159,7 @@ async function scrapePage(url, scapeByLLM = false) {
           }
           await btnNextPage.click();
         }
-
-        await sleep(1000);
+        await sleep( 800);
       } catch (error) {
         console.log("retrying to click");
         const isBlocked = await checkElementIsBlocked(
@@ -136,10 +171,11 @@ async function scrapePage(url, scapeByLLM = false) {
       }
     }
 
-    
     if (scapeByLLM) {
       const prompt = generate_promptForScrappingFromReviewBlock(reviewFullData);
-      console.log("Scrapping review Data for filtered block of html code ⌛...");
+      console.log(
+        "Scrapping review Data for filtered block of html code ⌛..."
+      );
       let response = JSON.parse(await gemini_prompt(prompt));
       console.log(response);
       console.log("Scrapped review Data ✅ ");

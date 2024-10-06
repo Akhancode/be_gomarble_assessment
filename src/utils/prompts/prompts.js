@@ -10,7 +10,7 @@ Analyze the following HTML in array of html and return Most accurate CSS selecto
     paginationNextBtn : <CSS selector for element that goto  next page of review if you find any selectors from ${arrOfNextPageSelectors} take it else check the css Selector  in DOM and make sure it is unique for single element and searching this cssSelector the result should be one element if not RETRY to generate new one .  >,
     currentPageCounter : <CSS selector for pager list element for page 1 element by default ,ie it will be current highlighted page counter return number 0 >,
     paginationList : <CSS selector for parent element of {paginationBtn} , it wraps all the page counter in pagination list>,
-    totalNoOfPages : <Number value of total count of page if available in webpage if not availabe return number 0 >,
+    totalNoOfPages : <Number value of total count of page if available in webpage search inside container of pagination element find the max number page count if not availabe return number 0 >,
     popCloseBtnsArr : <Arr of string , value of strings will be CSS-SELECTOR for all the element with clickable or type action button to close the popup modal or any overlay window , i need this is array of string >
     }
 
