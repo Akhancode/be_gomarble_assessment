@@ -5,18 +5,6 @@
 Develop an API server capable of extracting reviews information from any given product page (e.g., Shopify, Amazon). The API should dynamically identify CSS elements of reviews and handle pagination to retrieve all reviews.
 
 
-<a href="https://summarigenius.streamlit.app/">
-</br>
-  <img src="https://static1.smartbear.co/swagger/media/assets/images/swagger_logo.svg" alt="Streamlit App" width="200"/>
-</a>
-
-
-</br>
-
-The API documentation, including in Swagger docs, is available at http://localhost:9000/api-docs
-Redirect to there for API details, testing endpoints .  </br>
-[Deployed server api doc ](http://gomarble-assessment.centralindia.cloudapp.azure.com/api-docs).
-
 ![SummarizeX Demo](demo.gif)
 
 ## Table of Contents
@@ -38,34 +26,47 @@ Additionally, an optional multi-process handling feature is integrated using Nod
 
 ## Features
 
-- Input field for OpenAI API key.
-- Text area to enter content or topics for summarization.
-- Generate summarized content with a click of a button.
+- Scrapping reviews from product review page [required product review page ]
+- Gemini 1.5 Flash model (LLM) is used to dynamically detect CSS selectors
+- Two versions of the scraping process [v1 and v2]
+- Pagination is handled with custom logic
+- Optional Feauture - Multi-process handling feature is integrated using Node.js child processes.
+- Interactive UI built with React.js
+- Deployed Backend and made CI-CD by utilizing github actions .
 
 ## Installation
 
-- To run SummariGenius locally, follow these steps:
+- To run Project locally, follow these steps:
 
 1. Clone the repository:
 
     ```bash
-    git clone https://github.com/codewithriza/SummariGenius/
+    git clone https://github.com/Akhancode/be_gomarble_assessment.git
  
     ```
 1. Go to the file:
 
     ```bash
-    cd SummariGenius
+    cd be_gomarble_assessment
     ```
 2. Install dependencies:
 
     ```bash
-    pip install -r requirements.txt
+    npm install 
     ```
-3. Run the application:
+3. Optional - if chrome doesnt exist please install dependency:
 
     ```bash
-    streamlit run app.py
+    npx puppeteer browsers install chrome
+    ```
+4. create a .env in root folder and paste variable :
+
+    Get the Backend env secrets from  [here](https://drive.google.com/file/d/1I9onZH3cmeFcaOsPis1-FQkp-g6rguvL/view?usp=sharing). Kindly paste accordingly.
+     
+4. Run the application:
+
+    ```bash
+    npm start
     ```
 
 ## Usage
@@ -74,13 +75,24 @@ After following the installation steps, open your browser and navigate to `local
 
 ## API Reference
 
-This project utilizes the OpenAI GPT-3 API for text summarization. For more information on the OpenAI API and its usage, refer to the [OpenAI API documentation](https://beta.openai.com/docs/).
+<a href="https://summarigenius.streamlit.app/">
+</br>
+  <img src="https://static1.smartbear.co/swagger/media/assets/images/swagger_logo.svg" alt="Streamlit App" width="200"/>
+</a>
+</br>
+The API documentation, including in Swagger docs, is available at 
 
-To get an API key for using the OpenAI API, you can [sign up here](https://platform.openai.com/api-keys).
 
-## Contributing
+Redirect to there for API details, testing endpoints .  </br>
 
-Contributions are welcome! Feel free to submit issues or pull requests.
+
+- Deployed api  [Deployed server api doc ](http://gomarble-assessment.centralindia.cloudapp.azure.com/api-docs).
+
+- Localhost api  [http://localhost:9000/api-docs](http://localhost:9000/api-docs)
+
+
+
+
 
 ## License
 
