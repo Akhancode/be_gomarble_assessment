@@ -89,13 +89,14 @@ Additionally, an optional multi-process handling feature is integrated using Nod
 </br>
 The API documentation, including in Swagger docs, is available at 
 
-
 Redirect to there for API details, testing endpoints .  </br>
 
 
 - Deployed api  [Deployed server api doc ](http://gomarble-assessment.centralindia.cloudapp.azure.com/api-docs).
 
 - Localhost api  [http://localhost:9000/api-docs](http://localhost:9000/api-docs)
+
+ ![swagger-api-doc](./assessment/screenshots/swagger.png)
 
 
 
@@ -117,6 +118,7 @@ Used Azure Virtual Machine , It provides the resources needed to host your Node.
 
 ## FrontEnd
    ### Repository for Front End [here](https://github.com/Akhancode/fe_gomarble_assessment). 
+   ![swagger-api-doc](./assessment/screenshots/app.png)
 
 
 
