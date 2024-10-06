@@ -14,9 +14,7 @@ Develop an API server capable of extracting reviews information from any given p
 - [Installation](#installation)
 - [Usage](#usage)
 - [API Reference](#api-reference)
-- [Contributing](#contributing)
-- [License](#license)
-- [Acknowledgements](#acknowledgements)
+
 
 
 ## Introduction
@@ -70,7 +68,7 @@ Additionally, an optional multi-process handling feature is integrated using Nod
     ```
 
 ## Usage
- - ### versions
+ - ### Versions
      Two Versions of Scrapping have been implemented
      - **v1**
            This version will scrape data utilizing relevant CSS selectors, which are identified by a language model (LLM) and by using puppeteer methods we scrape the data accordingly.
@@ -102,12 +100,5 @@ Redirect to there for API details, testing endpoints .  </br>
 
 
 
-## Contact Me
-
-If you have any questions, suggestions, or issues with the script, feel free to contact me.
-
----
-[![Discord](https://img.shields.io/badge/Discord-%235865F2.svg?style=for-the-badge&logo=discord&logoColor=white)](https://discord.com/users/840848369484169266)
-[![X](https://img.shields.io/badge/X-%23000000.svg?style=for-the-badge&logo=X&logoColor=white)](https://twitter.com/f1ndkeys)
 
 
