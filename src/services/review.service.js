@@ -237,13 +237,8 @@ const closeOverlay = async (page, closeButtonSelectors) => {
 async function scrapePage(url, scapeByLLM = false) {
   const pptOption = {
     headless: headlessValue, // Set to true for headless mode
-    args: ['--no-sandbox', '--disable-setuid-sandbox']
-    
   };
-  if(process.env.NODE == "production"){
-    pptOption["executablePath"]="/usr/bin/chromium-browser"
-  }
-  console.log(pptOption)
+  
   const browser = await puppeteer.launch(pptOption);
   try {
     scapeByLLM

@@ -34,7 +34,7 @@ paths:
           type: string
           required: true
           description: product review page link  
-          example: https://bhumi.com.au/products/organic-cotton-flannelette-sheet-set-plaid
+          example: https://www.amazon.in/Wowon-Art-Fineliners-Calligraphy-Sketching/product-reviews/B0BFDW9D2W/ref=cm_cr_dp_d_show_all_btm?ie=UTF8&reviewerType=all_reviews
         - in: query
           name: scrapeByLLM
           type: string
