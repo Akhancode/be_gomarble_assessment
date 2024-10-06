@@ -104,31 +104,6 @@ Redirect to there for API details, testing endpoints .  </br>
  ![swagger-api-doc](./assessment/screenshots/swagger.png)
 
 
-
-## Deployment
-
-### PM2
-Used PM2 is a process manager for Node.js applications. It helps keep your app running smoothly by automatically restarting it if it crashes.This manage multiple applications and monitor their performance easily.
-
-### Nginx
-Used Nginx is a web server that can also be used as a reverse proxy. It helps serve your application to users by handling incoming requests, distributing them to your Node.js app, and managing static files.
-
-### GitHub Actions
-Used GitHub Actions to automates workflows directly from your GitHub repository. You can set it up to automatically deploy your application whenever you push changes to your code, making the deployment process efficient and consistent ,Basically achieving CI CD .
-
-### Azure VM
-Used Azure Virtual Machine , It provides the resources needed to host your Node.js app.  ensuring that your application runs smoothly and efficiently.
-
-
-
-## FrontEnd
-   ### Repository for Front End [here](https://github.com/Akhancode/fe_gomarble_assessment). 
-   ![swagger-api-doc](./assessment/screenshots/app.png)
-
-
-
-
-
 ## Project Structure
     BackendTask
     ├── README.md
@@ -166,8 +141,25 @@ Used Azure Virtual Machine , It provides the resources needed to host your Node.
    
 
 
+## Deployment
+
+### PM2
+Used PM2 is a process manager for Node.js applications. It helps keep your app running smoothly by automatically restarting it if it crashes.This manage multiple applications and monitor their performance easily.
+
+### Nginx
+Used Nginx is a web server that can also be used as a reverse proxy. It helps serve your application to users by handling incoming requests, distributing them to your Node.js app, and managing static files.
+
+### GitHub Actions
+Used GitHub Actions to automates workflows directly from your GitHub repository. You can set it up to automatically deploy your application whenever you push changes to your code, making the deployment process efficient and consistent ,Basically achieving CI CD .
+
+### Azure VM
+Used Azure Virtual Machine , It provides the resources needed to host your Node.js app.  ensuring that your application runs smoothly and efficiently.
 
 
+
+## FrontEnd
+   ### Repository for Front End [here](https://github.com/Akhancode/fe_gomarble_assessment). 
+   ![swagger-api-doc](./assessment/screenshots/app.png)
 
 
 
