@@ -1,4 +1,4 @@
-# SummariGenius
+<img src="http://gomarble-assessment.centralindia.cloudapp.azure.com/static/media/logo.c997e5e8b72a6f7a15aa00ff12ea433e.svg" alt="Streamlit App" width="50"/> <img src="http://gomarble-assessment.centralindia.cloudapp.azure.com/static/media/logo-text.caad81f7757ac9f3b956bf5211a50d07.svg" alt="Streamlit App" width="200"/> - Assessment
 
 ## Objective
 
@@ -84,10 +84,8 @@ Additionally, an optional multi-process handling feature is integrated using Nod
 
 ## API Reference
 
-<a href="https://summarigenius.streamlit.app/">
 </br>
   <img src="https://static1.smartbear.co/swagger/media/assets/images/swagger_logo.svg" alt="Streamlit App" width="200"/>
-</a>
 </br>
 The API documentation, including in Swagger docs, is available at 
 
