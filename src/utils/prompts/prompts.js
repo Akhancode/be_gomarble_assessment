@@ -27,6 +27,8 @@ const generate_promptForScrappingFromReviewBlock = (arrReviewBlock) => {
         "reviewer": "< text value for reviewer name content >",
         }
         
-        here HTML content in Array of object as each review as object dont loose any scrape full object : ${arrReviewBlock}`;
+    here HTML content in Array of object as each review as object dont loose any scrape full object : ${arrReviewBlock}
+    **should return in array of object in JSON format.
+    `;
 };
 module.exports = { generate_promptForFindingSelectors , generate_promptForScrappingFromReviewBlock };

@@ -2,17 +2,18 @@ const { scrapePage } = require("../services/review.service");
 
 
 
-// Get the URL from the parent process (passed as an argument)
+// Get the URL and query scrapebyllm from the parent process (passed as an argument)
 const url = process.argv[2];
+const scrapeByLLM = process.argv[3];
 
 
-scrapePage(url)
+scrapePage(url,scrapeByLLM)
     .then((data) => {
         // Send the data back to the parent process
-        process.send({ url, data });
-        process.exit(0); // Exit after scraping
+        process.send(data);
+        process.exit(0); 
     })
     .catch((error) => {
         process.send({ error: error.message });
-        process.exit(1); // Exit with error
+        process.exit(1); 
     });

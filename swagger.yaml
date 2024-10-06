@@ -11,16 +11,10 @@ info:
                   
   version: 1.0.0
 servers:
-  # - url: http://13.60.216.166/api
+  - url: http://gomarble-assessment.centralindia.cloudapp.azure.com/api
   - url: http://localhost:9000/api
     # description:       Optional server description, e.g. Internal staging server for testing
-components:
-  securitySchemes:
-    BearerAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
-      securityDefinitions:
+
 paths:
  #PAYMENT
   /reviews:
