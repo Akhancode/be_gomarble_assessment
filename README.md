@@ -129,6 +129,46 @@ Used Azure Virtual Machine , It provides the resources needed to host your Node.
 
 
 
+## Project Structure
+    BackendTask
+    ├── README.md
+    ├── nodemon.json
+    ├── package-lock.json
+    ├── package.json
+    ├── server.js
+    ├── singlepage_test.js
+    ├── src
+    │   ├── controllers
+    │   │   └── reviews.controller.js
+    │   ├── middleware
+    │   │   └── monitor-api.js
+    │   ├── model
+    │   ├── routes
+    │   │   ├── index.js
+    │   │   └── reviews.route.js
+    │   ├── services
+    │   │   └── review.service.js
+    │   ├── utils
+    │   │   ├── constants
+    │   │   │   └── testData.js
+    │   │   ├── errors
+    │   │   │   └── error.js
+    │   │   ├── helper
+    │   │   │   ├── helperFunction.js
+    │   │   │   └── scraperHelperFunctions.js
+    │   │   ├── llm
+    │   │   │   └── helper.js
+    │   │   └── prompts
+    │   │       └── prompts.js
+    │   └── workers
+    │       └── scrapeWorker.js
+    └── swagger.yaml
+   
+
+
+
+
+
 
 
 
