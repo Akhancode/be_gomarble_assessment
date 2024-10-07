@@ -29,6 +29,33 @@ Additionally, an optional multi-process handling feature is integrated using Nod
    - Please have a look at Diagram   [download](https://drive.google.com/file/d/16xI4IUSYHIKe5KCHf8CZLpBJZ9DXw9AN/view?usp=drive_link)
 
 
+   ## Steps followed 
+
+   
+   #### Steps 1 : User sends GET request with product Review Page URL
+   #### Steps 2 : reviewController check query
+   - if yes move child process review service and review service normal scraping
+   #### Steps 3 : Start Scraping Function 
+   #### Steps 4 : Clean HTML block and close common overlay/popups
+   #### Steps 5 : Utilizing LLM to find selectors
+   #### Steps 6 : Handling [pagination](#pagination) 
+   #### Steps 7 : Return Json Data By selected version  
+   #### Steps 8 : Response to User. 
+   
+   
+   ### Pagination
+   - Run loop in condition of next page / next button Exist .
+   - Scrape the data for review block
+   - Some pages wont show Ending NextButton
+   - In that case i compare review block with last recent block if it matches it check for ( currentPageNo > Total Number Pages ) then it breaks loop
+   - Return the collected after queryselect all innerText value by css selector
+   
+   
+   
+
+   
+
+
 ## Features
 
 - Scrapping reviews from product review page [required product review page ]
