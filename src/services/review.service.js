@@ -48,6 +48,7 @@ async function scrapePage(url, scapeByLLM = false) {
     ];
     const page = await browser.newPage();
     await page.goto(url, { waitUntil: "domcontentloaded", timeout: 50000 });
+    await sleep(3000)
     await scrollToBottom(page);
     await closeOverlay(page, arrOfPopUpCloseButtons);
 
@@ -139,7 +140,7 @@ async function scrapePage(url, scapeByLLM = false) {
           }
           await btnNextPage.click();
         }
-        await sleep(800);
+        await sleep(1000);
       } catch (error) {
         console.log("retrying to click");
         const isBlocked = await checkElementIsBlocked(
