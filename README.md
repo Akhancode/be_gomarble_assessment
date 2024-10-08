@@ -26,7 +26,8 @@ Develop an API server capable of extracting reviews information from any given p
 Additionally, an optional multi-process handling feature is integrated using Node.js child processes to optimize scraping performance. API documentation is provided via Swagger, and an interactive frontend UI is built with React.js. Both the backend and frontend are successfully deployed on Azure.
 
 ## Workflow
-   - Please have a look at Diagram   [download](https://drive.google.com/file/d/16xI4IUSYHIKe5KCHf8CZLpBJZ9DXw9AN/view?usp=drive_link)
+   - Please have a look at Diagram  <a href="https://drive.google.com/file/d/16xI4IUSYHIKe5KCHf8CZLpBJZ9DXw9AN/view?usp=drive_link" target="_blank" rel="noopener noreferrer">download html</a>  
+
 
 
  
@@ -110,6 +111,9 @@ Additionally, an optional multi-process handling feature is integrated using Nod
 The API documentation, including in Swagger docs, is available at **localhost:9000/api-docs** 
 select the server in swagger accordingly 
 Redirect to there for API details, testing endpoints .  </br>
+
+#### /api/reviews?page=<url>
+       - url = `Should be product reviews page url (where all reviews Existing)`
 
 
 - Deployed api  [Deployed server api doc ](http://gomarble-assessment.centralindia.cloudapp.azure.com/api-docs).
