@@ -14,7 +14,7 @@ const scrollToBottom = async (page) => {
           clearInterval(timer);
           resolve();
         }
-      }, 2);
+      }, 150);
     });
   });
 };
@@ -164,7 +164,7 @@ async function scrapeByLLMByReviewTile(page, selectors, url) {
   return reviewsData;
 }
 
-async function scrollIntoELement(element,page) {
+async function scrollIntoELement(element, page) {
   if (element) {
     // Scroll to the element
     await page.evaluate((el) => {
@@ -176,6 +176,12 @@ async function scrollIntoELement(element,page) {
     console.log(`Element not found`);
   }
 }
+const formatResponseReview = (data) => {
+  return {
+    reviews_count: data?.length,
+    reviews: data,
+  };
+};
 //deprecated- functions
 const getAllElementRelatesToSearch = async (
   page,
@@ -243,4 +249,5 @@ module.exports = {
   scrollToBottom,
   closeOverlay,
   scrollIntoELement,
+  formatResponseReview,
 };

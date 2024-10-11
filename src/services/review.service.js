@@ -18,6 +18,7 @@ const {
   scrollToBottom,
   closeOverlay,
   scrollIntoELement,
+  formatResponseReview,
 } = require("../utils/helper/scraperHelperFunctions");
 const headlessValue = parseBoolean(process.env.ISHEADLESS);
 //functions------
@@ -41,15 +42,15 @@ async function scrapePage(url, scapeByLLM = false) {
       `[data-testid="CloseIcon"]`,
       `button.klaviyo-close-form.kl-private-reset-css-Xuajs1[aria-label="Close dialog"]`,
       ".store-selection-popup--inner .store-selection-popup--close",
-
+      ".MuiSvgIcon-root.MuiSvgIcon-fontSizeInherit",
       `[data-testid="CloseIcon"]`,
       `button[aria-label="Close dialog"]`,
       `[data-testid*="Close"]`,
     ];
     const page = await browser.newPage();
     await page.goto(url, { waitUntil: "domcontentloaded", timeout: 50000 });
-    await sleep(3000)
     await scrollToBottom(page);
+    await sleep(10000);
     await closeOverlay(page, arrOfPopUpCloseButtons);
 
     //getting All elements related review Attribute
@@ -160,11 +161,12 @@ async function scrapePage(url, scapeByLLM = false) {
       let response = JSON.parse(await gemini_prompt(prompt));
       console.log(response);
       console.log("Scrapped review Data ✅ ");
-      return response;
+      
+      return formatResponseReview(response);
     } else {
       console.log(reviewFullData);
       console.log("Scrapped review Data ✅ ");
-      return reviewFullData;
+      return formatResponseReview(reviewFullData);;
     }
   } catch (error) {
     console.log(error);

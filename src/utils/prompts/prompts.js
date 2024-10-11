@@ -11,7 +11,7 @@ Analyze the following HTML in array of html and return Most accurate CSS selecto
     currentPageCounter : <CSS selector for pager list element for page 1 element by default ,ie it will be current highlighted page counter return number 0 >,
     paginationList : <CSS selector for parent element of {paginationBtn} , it wraps all the page counter in pagination list>,
     totalNoOfPages : <Number value of total count of page if available in webpage search inside container of pagination element find the max number page count if not availabe return number 0 >,
-    popCloseBtnsArr : <Arr of string , value of strings will be CSS-SELECTOR for all the element with clickable or type action button to close the popup modal or any overlay window , i need this is array of string >
+    popCloseBtnsArr : <Arr of string , value of strings will be  CSS-SELECTOR for close button for POPUPs , all the element with clickable or type action button to close the POPUP modal or any overlay window , i need this is array of string >
     }
 
 From Array of HTML content ${reviewHtml}    
