@@ -13,8 +13,8 @@ Develop an API server capable of extracting reviews information from any given p
 - [WorkFlow](#workflow)
 - [Features](#features)
 - [Installation](#installation)
-- [Usage](#usage)
 - [API Reference](#api-reference)
+- [Usage](#usage)
 - [Deployment](#deployment)
 - [FrontEnd](#frontend)
 
@@ -26,7 +26,36 @@ Develop an API server capable of extracting reviews information from any given p
 Additionally, an optional multi-process handling feature is integrated using Node.js child processes to optimize scraping performance. API documentation is provided via Swagger, and an interactive frontend UI is built with React.js. Both the backend and frontend are successfully deployed on Azure.
 
 ## Workflow
-   - Please have a look at Diagram   [download](https://drive.google.com/file/d/16xI4IUSYHIKe5KCHf8CZLpBJZ9DXw9AN/view?usp=drive_link)
+   - Please have a look at Diagram  <a href="https://drive.google.com/file/d/16xI4IUSYHIKe5KCHf8CZLpBJZ9DXw9AN/view?usp=drive_link" target="_blank" rel="noopener noreferrer">download html</a>  
+
+
+
+ 
+   ## Steps followed 
+
+   
+   #### Steps 1 : User sends GET request with product Review Page URL
+   #### Steps 2 : reviewController check query
+   - if yes move child process review service and review service normal scraping
+   #### Steps 3 : Start Scraping Function 
+   #### Steps 4 : Clean HTML block and close common overlay/popups
+   #### Steps 5 : Utilizing LLM to find selectors
+   #### Steps 6 : Handling [pagination](#pagination) 
+   #### Steps 7 : Return Json Data By selected version  
+   #### Steps 8 : Response to User. 
+   
+   
+   ### Pagination
+   - Run loop in condition of next page / next button Exist .
+   - Scrape the data for review block
+   - Some pages wont show Ending NextButton
+   - In that case i compare review block with last recent block if it matches it check for ( currentPageNo > Total Number Pages ) then it breaks loop
+   - Return the collected after queryselect all innerText value by css selector
+   
+   
+   
+
+   
 
 
 ## Features
@@ -68,11 +97,32 @@ Additionally, an optional multi-process handling feature is integrated using Nod
 
     Get the Backend env secrets from  [here](https://drive.google.com/file/d/1I9onZH3cmeFcaOsPis1-FQkp-g6rguvL/view?usp=sharing). Kindly paste accordingly.
      
-4. Run the application:
+5. Run the application:
 
     ```bash
     npm start
     ```
+    
+## API Reference
+
+</br>
+  <img src="https://static1.smartbear.co/swagger/media/assets/images/swagger_logo.svg" alt="Streamlit App" width="200"/>
+</br>
+The API documentation, including in Swagger docs, is available at **localhost:9000/api-docs** 
+select the server in swagger accordingly 
+Redirect to there for API details, testing endpoints .  </br>
+
+#### /api/reviews?page=<url>
+       - url = `Should be product reviews page url (where all reviews Existing)`
+
+
+- Deployed api  [Deployed server api doc ](http://gomarble-assessment.centralindia.cloudapp.azure.com/api-docs).
+
+- Localhost api  [http://localhost:9000/api-docs](http://localhost:9000/api-docs)
+
+ ![swagger-api-doc](./assessment/screenshots/swagger.png)
+
+
 
 ## Usage
  - ### Versions
@@ -86,22 +136,6 @@ Additionally, an optional multi-process handling feature is integrated using Nod
  - ### Multi-process
      Node.js operates on a single-threaded model, which can lead to performance bottlenecks. By utilizing child processes, web scraping tasks are delegated to separate processes, enhancing              performance and preventing blocking in the main application workflow.
      
-
-## API Reference
-
-</br>
-  <img src="https://static1.smartbear.co/swagger/media/assets/images/swagger_logo.svg" alt="Streamlit App" width="200"/>
-</br>
-The API documentation, including in Swagger docs, is available at 
-
-Redirect to there for API details, testing endpoints .  </br>
-
-
-- Deployed api  [Deployed server api doc ](http://gomarble-assessment.centralindia.cloudapp.azure.com/api-docs).
-
-- Localhost api  [http://localhost:9000/api-docs](http://localhost:9000/api-docs)
-
- ![swagger-api-doc](./assessment/screenshots/swagger.png)
 
 
 ## Project Structure
