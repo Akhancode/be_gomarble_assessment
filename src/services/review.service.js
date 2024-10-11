@@ -161,12 +161,17 @@ async function scrapePage(url, scapeByLLM = false) {
       let response = JSON.parse(await gemini_prompt(prompt));
       console.log(response);
       console.log("Scrapped review Data ✅ ");
-      
-      return formatResponseReview(response);
+      return {
+        reviews_count: response?.length,
+        reviews: response,
+      };
     } else {
       console.log(reviewFullData);
       console.log("Scrapped review Data ✅ ");
-      return formatResponseReview(reviewFullData);;
+      return {
+        reviews_count: reviewFullData?.length,
+        reviews: reviewFullData,
+      };
     }
   } catch (error) {
     console.log(error);
