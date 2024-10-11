@@ -28,8 +28,13 @@ async function scrapePage(url, scapeByLLM = false) {
   const pptOption = {
     headless: headlessValue, // Set to true for headless mode
   };
-
-  const browser = await puppeteer.launch(pptOption);
+  const pptOption_2 = {
+    headless: false,
+    executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
+    userDataDir:"C:\\Users\\assessment\\AppData\\Local\\Google\\Chrome\\User Data\\Profile 1"
+  }
+  const node_env = process.env.NODE_ENV
+  const browser = await puppeteer.launch((node_env=="production")?pptOption_2:pptOption);
   try {
     scapeByLLM
       ? console.log("Initiated scrapping type  by 'LLM' ⌛ ")
