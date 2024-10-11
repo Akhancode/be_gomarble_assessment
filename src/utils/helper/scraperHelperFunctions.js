@@ -14,7 +14,7 @@ const scrollToBottom = async (page) => {
           clearInterval(timer);
           resolve();
         }
-      }, 2);
+      }, 200);
     });
   });
 };
