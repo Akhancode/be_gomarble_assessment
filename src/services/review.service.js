@@ -30,7 +30,6 @@ async function scrapePage(url, scapeByLLM = false) {
   };
 
   const browser = await puppeteer.launch(pptOption);
-  const context = await browser.createIncognitoBrowserContext();
   try {
     scapeByLLM
       ? console.log("Initiated scrapping type  by 'LLM' ⌛ ")
@@ -48,7 +47,7 @@ async function scrapePage(url, scapeByLLM = false) {
       `button[aria-label="Close dialog"]`,
       `[data-testid*="Close"]`,
     ];
-    const page = await context.newPage();
+    const page = await browser.newPage();
     await page.goto(url, { waitUntil: "domcontentloaded", timeout: 50000 });
     await scrollToBottom(page);
     await sleep(10000);
@@ -154,6 +153,10 @@ async function scrapePage(url, scapeByLLM = false) {
       }
     }
 
+    const client = await page.createCDPSession()
+    await client.send("Network.clearBrowserCache")
+    await client.send("Network.clearBrowserCookies")
+
     if (scapeByLLM) {
       const prompt = generate_promptForScrappingFromReviewBlock(reviewFullData);
       console.log(
@@ -178,6 +181,7 @@ async function scrapePage(url, scapeByLLM = false) {
     console.log(error);
     return error;
   } finally {
+    
     await browser.close();
   }
 }
